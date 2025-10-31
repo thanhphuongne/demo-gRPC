@@ -5,7 +5,7 @@ using Grpc.Core;
 using var channel = GrpcChannel.ForAddress("http://localhost:5220");
 var client = new Greeter.GreeterClient(channel);
 
-Console.WriteLine("=== gRPC Demo: All Communication Patterns ===\n");
+Console.WriteLine("=== gRPC Demo: Unary and Server Streaming ===\n");
 
 try
 {
@@ -43,48 +43,6 @@ try
         {
             Console.WriteLine($"  {response.Message}");
         }
-    }
-    Console.WriteLine();
-
-    // 3. Client Streaming RPC
-    Console.WriteLine("3. Client Streaming RPC Demo");
-    Console.WriteLine("Enter multiple names (press Enter after each, empty line to finish):");
-
-    using (var call = client.ClientStreamingHello())
-    {
-        string input;
-        while (!string.IsNullOrEmpty(input = Console.ReadLine() ?? ""))
-        {
-            await call.RequestStream.WriteAsync(new HelloRequest { Name = input });
-        }
-        await call.RequestStream.CompleteAsync();
-
-        var countReply = await call;
-        Console.WriteLine($"Client Streaming Response: {countReply.Summary}\n");
-    }
-
-    // 4. Bidirectional Streaming RPC
-    Console.WriteLine("4. Bidirectional Streaming RPC Demo");
-    Console.WriteLine("Enter names for bidirectional chat (empty line to finish):");
-
-    using (var call = client.BidirectionalHello())
-    {
-        var readTask = Task.Run(async () =>
-        {
-            await foreach (var response in call.ResponseStream.ReadAllAsync())
-            {
-                Console.WriteLine($"Server: {response.Message}");
-            }
-        });
-
-        string input;
-        while (!string.IsNullOrEmpty(input = Console.ReadLine() ?? ""))
-        {
-            await call.RequestStream.WriteAsync(new HelloRequest { Name = input });
-        }
-        await call.RequestStream.CompleteAsync();
-
-        await readTask;
     }
 
     Console.WriteLine("\n=== Demo Complete ===");

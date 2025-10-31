@@ -11,12 +11,6 @@ service Greeter {
 
   // Server streaming RPC: Server sends multiple greetings
   rpc ServerStreamingHello (HelloRequest) returns (stream HelloReply);
-
-  // Client streaming RPC: Client sends multiple names, server counts them
-  rpc ClientStreamingHello (stream HelloRequest) returns (HelloCountReply);
-
-  // Bidirectional streaming RPC: Both client and server exchange messages
-  rpc BidirectionalHello (stream HelloRequest) returns (stream HelloReply);
 }
 
 // The request message containing the user's name.
@@ -27,10 +21,4 @@ message HelloRequest {
 // The response message containing the greetings.
 message HelloReply {
   string message = 1;
-}
-
-// Response for client streaming with count
-message HelloCountReply {
-  int32 count = 1;
-  string summary = 2;
 }

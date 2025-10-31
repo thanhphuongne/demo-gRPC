@@ -49,41 +49,4 @@ public class GreeterService : Greeter.GreeterBase
             await Task.Delay(1000); // Simulate processing time
         }
     }
-
-    public override async Task<HelloCountReply> ClientStreamingHello(IAsyncStreamReader<HelloRequest> requestStream, ServerCallContext context)
-    {
-        _logger.LogInformation("Client streaming call started");
-
-        var names = new List<string>();
-        await foreach (var request in requestStream.ReadAllAsync())
-        {
-            names.Add(request.Name);
-            _logger.LogInformation($"Received name: {request.Name}");
-        }
-
-        var summary = string.Join(", ", names);
-        return new HelloCountReply
-        {
-            Count = names.Count,
-            Summary = $"Received {names.Count} names: {summary}"
-        };
-    }
-
-    public override async Task BidirectionalHello(IAsyncStreamReader<HelloRequest> requestStream, IServerStreamWriter<HelloReply> responseStream, ServerCallContext context)
-    {
-        _logger.LogInformation("Bidirectional streaming call started");
-
-        await foreach (var request in requestStream.ReadAllAsync())
-        {
-            _logger.LogInformation($"Bidirectional received: {request.Name}");
-
-            var reply = new HelloReply
-            {
-                Message = $"Echo: Hello {request.Name}! (from bidirectional stream)"
-            };
-
-            await responseStream.WriteAsync(reply);
-            await Task.Delay(500); // Simulate processing
-        }
-    }
 }
